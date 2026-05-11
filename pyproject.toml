@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vault-research-toolkit"
+version = "0.1.0"
+description = "Vault-based research toolkit: section/frontmatter protocol parser & generic research-skill scheduler. Used by fin-research-agent to feed an Obsidian vault, but vault-agnostic by design."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+  { name = "fin-studio maintainers" },
+]
+keywords = ["obsidian", "vault", "markdown", "research", "section", "frontmatter"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = [
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vault_research_toolkit"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/vault_research_toolkit",
+  "README.md",
+  "pyproject.toml",
+]
