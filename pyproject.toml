@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "vault-research-toolkit"
 version = "0.1.0"
-description = "Vault-based research toolkit: section/frontmatter protocol parser & generic research-skill scheduler. Used by fin-research-agent to feed an Obsidian vault, but vault-agnostic by design."
+description = "Section / frontmatter protocol parser and generic research-skill scheduler for Markdown vaults. Vault-agnostic; vault_root is caller-injected."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
@@ -24,6 +24,12 @@ classifiers = [
 dependencies = [
   "PyYAML>=6.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/fireflies-xlt/fin-studio-lib"
+Repository = "https://github.com/fireflies-xlt/fin-studio-lib"
+Issues = "https://github.com/fireflies-xlt/fin-studio-lib/issues"
+"fin-studio (host app)" = "https://github.com/fireflies-xlt/fin-studio"
 
 [project.optional-dependencies]
 dev = [

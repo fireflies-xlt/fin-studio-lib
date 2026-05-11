@@ -1,6 +1,6 @@
 # fin-studio-lib
 
-[`fin-studio`](../fin-studio/) 的协议工具仓库——把 vault 上的 section / frontmatter 协议与 research-类 skill 的通用调度骨架抽出来，给 fin-studio runtime 和任意 vault 仓库的 Python skills 共用。
+[`fin-studio`](https://github.com/fireflies-xlt/fin-studio) 的协议工具仓库——把 vault 上的 section / frontmatter 协议与 research-类 skill 的通用调度骨架抽出来，给 fin-studio runtime 和任意 vault 仓库的 Python skills 共用。
 
 主体包：`vault-research-toolkit`（`src/vault_research_toolkit/`）。仓库与具体 vault 解耦——`vault_root` 由 caller 注入，包本身仓库无关。
 
@@ -59,8 +59,10 @@ uv run pytest        # 已加 pytest 用例时
 
 | 仓库 | 关系 |
 |---|---|
-| [`fin-studio`](../fin-studio/) | 协议定义方 + 桌面 GUI；通过 `toolkitPath` 设置项注入本包到 skill venv |
-| [`fin-research-agent`](../fin-research-agent/) | 个人 / 小团队的 vault + 一组 Python skills，依赖本包提供的调度骨架 |
+| [`fin-studio`](https://github.com/fireflies-xlt/fin-studio) | 协议定义方 + 桌面 GUI；通过 `toolkitPath` 设置项注入本包到 skill venv |
+| [`fin-research-agent`](https://github.com/fireflies-xlt/fin-research-agent) | 个人 / 小团队的 vault + 一组 Python skills，依赖本包提供的调度骨架 |
+
+> 本地开发推荐把三个仓库 clone 到同一父目录（`<root>/fin-studio` / `<root>/fin-studio-lib` / `<root>/fin-research-agent`），fin-studio 设置面板的 Toolkit 目录会自动探测到 sibling 路径。
 
 ## 许可证
 
