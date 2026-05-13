@@ -1,49 +1,79 @@
 # fin-studio-lib
 
-[`fin-studio`](https://github.com/fireflies-xlt/fin-studio) 的协议工具仓库——把 vault 上的 section / frontmatter 协议与 research-类 skill 的通用调度骨架抽出来，给 fin-studio runtime 和任意 vault 仓库的 Python skills 共用。
+[`fin-studio`](https://github.com/fireflies-xlt/fin-studio) 的协议工具仓库——把 vault 上的 panel / frontmatter 协议抽出来，给 fin-studio runtime 和任意 vault 仓库的 Python panel-producer skills 共用。
 
-主体包：`vault-research-toolkit`（`src/vault_research_toolkit/`）。仓库与具体 vault 解耦——`vault_root` 由 caller 注入，包本身仓库无关。
+主体包：`vault-research-toolkit`（`src/vault_research_toolkit/`）。仓库与具体 vault 解耦——`vault_root` 自动从 `3-DataPanels/` 探测或由 caller 注入，包本身仓库无关。
 
 ## 模块
 
 | Module | 用途 |
 |---|---|
 | `vault_research_toolkit.frontmatter` | 读写 Markdown YAML frontmatter（`---\n…\n---\n`）。 |
-| `vault_research_toolkit.sections` | 解析 / 遍历 / 替换 `<!--section ... -->` 块。与 `fin-studio/shared/markdown/sections.ts` 协议一致。 |
-| `vault_research_toolkit.research` | 通用 `ResearchSkillSpec` + `main()`：建档 + 按 `freq` / `last_updated` 懒刷 sections 的调度骨架，资产无关。 |
+| `vault_research_toolkit.panel` | Panel 协议工具：`write_panel` / `read_panel` / `list_panels` / `df_to_md` / `rows_to_md` / `find_vault_root`。 |
 
-## Section 协议
+## Panel 协议（极简）
+
+一面板 = 一份 md，放在 `<vault>/3-DataPanels/<filename>.md`：
 
 ```markdown
-<!--section
-id: daily_basic
-machine: true
-source: research-stock/scripts/fetch_daily_basic.py
-freq: daily
+---
+title: 三七互娱 · 日基础数据
+asset: 三七互娱
+category: stock
+maintained_by: stock-daily-basic
 last_updated: 2026-05-08
--->
+---
 
 | 指标 | 值 |
 | --- | --- |
 | PE | 5.2 |
-
-<!--/section-->
+| PB | 0.6 |
 ```
 
-`source` 是 path-style：`<skillId>/scripts/<file>.py`，相对 `<vault_root>/.skills/` 解析；用 `importlib.util.spec_from_file_location` 按文件路径加载，目标文件须暴露 `fetch(info)` 与 `render(data)`。
+**文件名 = 唯一标识**（无独立 `panel_id` 字段）；frontmatter 5 字段；body 任意合法 markdown。完整规范见 [`fin-studio/docs/panel-protocol.md`](https://github.com/fireflies-xlt/fin-studio/blob/main/docs/panel-protocol.md)。
 
 ## 怎么被使用
 
-`runner: uv` 类型的 skill 在入口脚本顶部用 PEP 723 inline metadata 声明 PyPI 依赖；`vault-research-toolkit` 由 **fin-studio runtime** 在 spawn `uv run` 时通过 `--with-editable <toolkitPath>` 注入：
+`runner: uv` 的 panel-producer skill 在入口脚本顶部用 PEP 723 inline metadata 声明 PyPI 依赖；`vault-research-toolkit` 由 **fin-studio runtime** 在 spawn `uv run` 时通过 `--with-editable <local>` 或 `--with <git-url>` 自动注入（取决于 `toolkitPath` 设置）：
 
 ```bash
 uv run --with-editable G:\project\finance_group\fin-studio-lib \
-  vault/.skills/research-stock/scripts/refresh.py "平安银行"
+  vault/.skills/stock-daily-basic/scripts/produce.py --name 三七互娱
 ```
 
-`toolkitPath` 是 fin-studio 的设置项（「设置 → Skills（Python）→ Toolkit 目录」），指向**本仓库根目录**（包含 `pyproject.toml` 的那一级）。
+最简 producer（参数用 argparse，便于 fin-studio 把 `params` dict 转 CLI flag）：
 
-> 未来若本包 publish 到 PyPI，fin-studio 会切换成 `--with vault-research-toolkit==X.Y`；skill 端可以选择写进 PEP 723 `dependencies` 自己锁版本，也可以继续走 runtime 注入。
+```python
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["fin-data-client"]
+# ///
+import argparse
+from vault_research_toolkit.panel import write_panel, df_to_md
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--name", required=True)
+    args = p.parse_args()
+
+    df = fetch_daily_basic(args.name)
+    write_panel(
+        filename=f"{args.name}.日基础数据",
+        title=f"{args.name} · 日基础数据",
+        asset=args.name,
+        category="stock",
+        maintained_by="stock-daily-basic",
+        body=df_to_md(df),
+        params={"name": args.name},
+    )
+
+if __name__ == "__main__":
+    main()
+```
+
+`write_panel` 自动写到 `<vault>/3-DataPanels/<filename>.md` 并填 `last_updated`；`params` 透写进 frontmatter，给 fin-studio 重刷按钮复用。vault 根从 `VAULT_ROOT` 环境变量 / 父目录回溯 / `cwd` 三档探测。
+
+> 未来若本包 publish 到 PyPI，fin-studio 会切换成 `--with vault-research-toolkit==X.Y`；skill 端可选写进 PEP 723 `dependencies` 自己锁版本。
 
 ## 本地开发
 
@@ -60,7 +90,7 @@ uv run pytest        # 已加 pytest 用例时
 | 仓库 | 关系 |
 |---|---|
 | [`fin-studio`](https://github.com/fireflies-xlt/fin-studio) | 协议定义方 + 桌面 GUI；通过 `toolkitPath` 设置项注入本包到 skill venv |
-| [`fin-research-agent`](https://github.com/fireflies-xlt/fin-research-agent) | 个人 / 小团队的 vault + 一组 Python skills，依赖本包提供的调度骨架 |
+| [`fin-research-agent`](https://github.com/fireflies-xlt/fin-research-agent) | 示例 vault + 一组 panel-producer skills，依赖本包 |
 
 > 本地开发推荐把三个仓库 clone 到同一父目录（`<root>/fin-studio` / `<root>/fin-studio-lib` / `<root>/fin-research-agent`），fin-studio 设置面板的 Toolkit 目录会自动探测到 sibling 路径。
 

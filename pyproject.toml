@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vault-research-toolkit"
-version = "0.1.0"
-description = "Section / frontmatter protocol parser and generic research-skill scheduler for Markdown vaults. Vault-agnostic; vault_root is caller-injected."
+version = "0.2.0"
+description = "Panel + frontmatter protocol primitives for Markdown vaults (Fin Studio). Vault-agnostic; vault_root auto-discovered or caller-injected."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
   { name = "fin-studio maintainers" },
 ]
-keywords = ["obsidian", "vault", "markdown", "research", "section", "frontmatter"]
+keywords = ["obsidian", "vault", "markdown", "research", "panel", "frontmatter"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",

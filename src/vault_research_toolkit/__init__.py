@@ -1,23 +1,19 @@
-"""vault-research-toolkit: vault-based research primitives.
+"""vault-research-toolkit: vault-based research primitives for Fin Studio.
 
 Public surface:
 
-    from vault_research_toolkit import frontmatter, sections
-    from vault_research_toolkit.research import ResearchSkillSpec, main, run_refresh
+    from vault_research_toolkit import frontmatter, panel
+    from vault_research_toolkit.panel import write_panel, read_panel, df_to_md
 """
 
 from __future__ import annotations
 
-from . import frontmatter, sections
-from .research import ResearchSkillSpec, main, run_refresh
+from . import frontmatter, panel
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "frontmatter",
-    "sections",
-    "ResearchSkillSpec",
-    "main",
-    "run_refresh",
+    "panel",
     "__version__",
 ]
