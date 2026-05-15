@@ -30,23 +30,28 @@ last_updated: 2026-05-08
 | PB | 0.6 |
 ```
 
-**文件名 = 唯一标识**（无独立 `panel_id` 字段）；frontmatter 5 字段；body 任意合法 markdown。完整规范见 [`fin-studio/docs/panel-protocol.md`](https://github.com/fireflies-xlt/fin-studio/blob/main/docs/panel-protocol.md)。
+**文件名 = 唯一标识**；frontmatter 5 字段；body 任意合法 markdown。完整规范见 [`fin-studio/docs/panel-protocol.md`](https://github.com/fireflies-xlt/fin-studio/blob/main/docs/panel-protocol.md)。
 
 ## 怎么被使用
 
-`runner: uv` 的 panel-producer skill 在入口脚本顶部用 PEP 723 inline metadata 声明 PyPI 依赖；`vault-research-toolkit` 由 **fin-studio runtime** 在 spawn `uv run` 时通过 `--with-editable <local>` 或 `--with <git-url>` 自动注入（取决于 `toolkitPath` 设置）：
+`runner: uv` 的 panel-producer skill 在入口脚本顶部用 **PEP 723** 声明全部依赖，其中**必须**包含 `vault-research-toolkit`。
+
+示例（与 [`fin-vault-demo`](https://github.com/fireflies-xlt/fin-vault-demo) 内置 skill 一致）：
 
 ```bash
-uv run --with-editable G:\project\finance_group\fin-studio-lib \
-  vault/.skills/stock-daily-basic/scripts/produce.py --name 三七互娱
+cd /path/to/vault   # 或 export VAULT_ROOT=...
+uv run .skills/stock-daily-basic/scripts/produce.py --name 三七互娱
 ```
 
 最简 producer（参数用 argparse，便于 fin-studio 把 `params` dict 转 CLI flag）：
 
 ```python
 # /// script
-# requires-python = ">=3.11"
-# dependencies = ["fin-data-client"]
+# requires-python = ">=3.12"
+# dependencies = [
+#   "pandas>=2.0",
+#   "vault-research-toolkit @ git+https://github.com/fireflies-xlt/fin-studio-lib",
+# ]
 # ///
 import argparse
 from vault_research_toolkit.panel import write_panel, df_to_md
@@ -73,7 +78,7 @@ if __name__ == "__main__":
 
 `write_panel` 自动写到 `<vault>/3-DataPanels/<filename>.md` 并填 `last_updated`；`params` 透写进 frontmatter，给 fin-studio 重刷按钮复用。vault 根从 `VAULT_ROOT` 环境变量 / 父目录回溯 / `cwd` 三档探测。
 
-> 未来若本包 publish 到 PyPI，fin-studio 会切换成 `--with vault-research-toolkit==X.Y`；skill 端可选写进 PEP 723 `dependencies` 自己锁版本。
+> 各 skill **独立**维护自己的 `vault-research-toolkit` 版本 / git URL；fork 或私有源时只改该 skill 的 PEP 723 即可。
 
 ## 本地开发
 
@@ -84,15 +89,6 @@ uv venv
 uv pip install -e ".[dev]"
 uv run pytest        # 已加 pytest 用例时
 ```
-
-## 相关仓库
-
-| 仓库 | 关系 |
-|---|---|
-| [`fin-studio`](https://github.com/fireflies-xlt/fin-studio) | 协议定义方 + 桌面 GUI；通过 `toolkitPath` 设置项注入本包到 skill venv |
-| [`fin-research-agent`](https://github.com/fireflies-xlt/fin-research-agent) | 示例 vault + 一组 panel-producer skills，依赖本包 |
-
-> 本地开发推荐把三个仓库 clone 到同一父目录（`<root>/fin-studio` / `<root>/fin-studio-lib` / `<root>/fin-research-agent`），fin-studio 设置面板的 Toolkit 目录会自动探测到 sibling 路径。
 
 ## 许可证
 
