@@ -2,7 +2,7 @@
 
 [`fin-studio`](https://github.com/fireflies-xlt/fin-studio) 的协议工具仓库——把 vault 上的 panel / frontmatter 协议抽出来，给 fin-studio runtime 和任意 vault 仓库的 Python panel-producer skills 共用。
 
-主体包：`vault-research-toolkit`（`src/vault_research_toolkit/`）。仓库与具体 vault 解耦——`vault_root` 自动从 `3-DataPanels/` 探测或由 caller 注入，包本身仓库无关。
+主体包：`vault-research-toolkit`（`src/vault_research_toolkit/`）。仓库与具体 vault 解耦——`vault_root` 自动从 `DataPanels/` 探测或由 caller 注入，包本身仓库无关。
 
 ## 模块
 
@@ -13,7 +13,7 @@
 
 ## Panel 协议（极简）
 
-一面板 = 一份 md，放在 `<vault>/3-DataPanels/<filename>.md`：
+一面板 = 一份 md，放在 `<vault>/DataPanels/<filename>.md`：
 
 ```markdown
 ---
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     main()
 ```
 
-`write_panel` 自动写到 `<vault>/3-DataPanels/<filename>.md` 并填 `last_updated`；`params` 透写进 frontmatter，给 fin-studio 重刷按钮复用。vault 根从 `VAULT_ROOT` 环境变量 / 父目录回溯 / `cwd` 三档探测。
+`write_panel` 自动写到 `<vault>/DataPanels/<filename>.md` 并填 `last_updated`；`params` 透写进 frontmatter，给 fin-studio 重刷按钮复用。vault 根从 `VAULT_ROOT` 环境变量 / 父目录回溯 / `cwd` 三档探测。
 
 > 各 skill **独立**维护自己的 `vault-research-toolkit` 版本 / git URL；fork 或私有源时只改该 skill 的 PEP 723 即可。
 

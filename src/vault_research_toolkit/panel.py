@@ -3,7 +3,7 @@
 协议规范见 fin-studio `docs/panel-protocol.md`。
 
 面板物理布局：
-- 一面板 = 一份 md，放在 `<vault>/3-DataPanels/<filename>.md`
+- 一面板 = 一份 md，放在 `<vault>/DataPanels/<filename>.md`
 - 文件名 = 唯一标识（无独立 panel_id 字段）
 - frontmatter 5 字段：title / asset / category / maintained_by / last_updated
 - body 为任意合法 markdown
@@ -21,7 +21,7 @@ from typing import Iterable
 
 from . import frontmatter
 
-PANELS_DIR = "3-DataPanels"
+PANELS_DIR = "DataPanels"
 
 
 @dataclass(frozen=True)
@@ -49,7 +49,7 @@ class Panel:
 
 
 def find_vault_root(start: Path | str | None = None) -> Path:
-    """沿父目录查找包含 `3-DataPanels/` 子目录的 vault 根。
+    """沿父目录查找包含 `DataPanels/` 子目录的 vault 根。
 
     优先级：
     1. 显式传入的 `start` 起点
@@ -99,7 +99,7 @@ def write_panel(
     params: dict | None = None,
     vault_root: Path | str | None = None,
 ) -> Path:
-    """写一份 panel 到 `<vault>/3-DataPanels/<filename>.md`，覆盖已存在的同名文件。
+    """写一份 panel 到 `<vault>/DataPanels/<filename>.md`，覆盖已存在的同名文件。
 
     `last_updated` 默认填今天（UTC）。
     `params` 是本次 producer 运行收到的参数字典；写入 frontmatter `params:` 子对象，
