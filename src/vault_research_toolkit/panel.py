@@ -5,7 +5,7 @@
 面板物理布局：
 - 一面板 = 一份 md，放在 `<vault>/DataPanels/<filename>.md`
 - 文件名 = 唯一标识（无独立 panel_id 字段）
-- frontmatter 5 字段：title / asset / category / maintained_by / last_updated
+- frontmatter 4 字段：title / asset / maintained_by / last_updated
 - body 为任意合法 markdown
 
 Producer 通常只用 `write_panel(...)` 一个函数；UI / 索引侧用 `read_panel` / `list_panels`。
@@ -33,7 +33,6 @@ class Panel:
 
     title: str
     asset: str
-    category: str
     maintained_by: str
     """产出该 panel 的 skill id。"""
 
@@ -92,7 +91,6 @@ def write_panel(
     filename: str,
     title: str,
     asset: str,
-    category: str,
     maintained_by: str,
     body: str,
     last_updated: dt.date | None = None,
@@ -110,7 +108,6 @@ def write_panel(
     meta: dict = {
         "title": title,
         "asset": asset,
-        "category": category,
         "maintained_by": maintained_by,
         "last_updated": last_updated or dt.date.today(),
     }
@@ -131,10 +128,9 @@ def read_panel(filename: str, *, vault_root: Path | str | None = None) -> Panel:
 def list_panels(
     *,
     vault_root: Path | str | None = None,
-    category: str | None = None,
     asset: str | None = None,
 ) -> list[Panel]:
-    """列出 vault 内所有 panel，可按 `category` / `asset` 过滤。"""
+    """列出 vault 内所有 panel，可按 `asset` 过滤。"""
     root = Path(vault_root) if vault_root else find_vault_root()
     panels_dir = root / PANELS_DIR
     if not panels_dir.is_dir():
@@ -144,8 +140,6 @@ def list_panels(
         try:
             p = _load_panel(md)
         except (ValueError, OSError):
-            continue
-        if category and p.category != category:
             continue
         if asset and p.asset != asset:
             continue
@@ -167,7 +161,6 @@ def _load_panel(path: Path) -> Panel:
         filename=path.stem,
         title=str(meta.get("title") or path.stem),
         asset=str(meta.get("asset") or ""),
-        category=str(meta.get("category") or ""),
         maintained_by=str(meta.get("maintained_by") or ""),
         last_updated=last_updated,
         body=body,

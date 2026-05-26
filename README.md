@@ -19,7 +19,6 @@
 ---
 title: 三七互娱 · 日基础数据
 asset: 三七互娱
-category: stock
 maintained_by: stock-daily-basic
 last_updated: 2026-05-08
 ---
@@ -30,7 +29,7 @@ last_updated: 2026-05-08
 | PB | 0.6 |
 ```
 
-**文件名 = 唯一标识**；frontmatter 5 字段；body 任意合法 markdown。完整规范见 [`fin-studio/docs/panel-protocol.md`](https://github.com/fireflies-xlt/fin-studio/blob/main/docs/panel-protocol.md)。
+**文件名 = 唯一标识**；frontmatter 4 字段；body 任意合法 markdown。完整规范见 [`fin-studio/docs/panel-protocol.md`](https://github.com/fireflies-xlt/fin-studio/blob/main/docs/panel-protocol.md)。
 
 ## 怎么被使用
 
@@ -66,7 +65,6 @@ def main():
         filename=f"{args.name}.日基础数据",
         title=f"{args.name} · 日基础数据",
         asset=args.name,
-        category="stock",
         maintained_by="stock-daily-basic",
         body=df_to_md(df),
         params={"name": args.name},
